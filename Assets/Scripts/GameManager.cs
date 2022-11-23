@@ -10,13 +10,19 @@ public class GameManager : MonoBehaviour
     private float initX = -1.5f;
     private float initY = -4.2f;
 
+    // In-game values
+
+    public bool isPlaying;
+
     private int currentId = 0;
     private int furthestActivatedIceId = 0;
 
-    private GameObject iceBlockPrefab;
-    private List<IceBlock> iceblocks;
+    //
 
-    public bool isPlaying;
+    [SerializeField] private GameObject iceBlockPrefab;
+    [SerializeField] private List<IceBlock> iceblocks;
+
+    [SerializeField] private Transform iceFolder;
 
     private float maxInitialIceDurability = 60;
     private float minInitialIceDurability = 5;
@@ -30,10 +36,23 @@ public class GameManager : MonoBehaviour
 
     private float initialGenerationCount = 150;
 
+    private void Start()
+    {
+        StartGame();
+    }
+
+    private void Update()
+    {
+        if (isPlaying)
+        {
+
+        }
+    }
+
     public void StartGame()
     {
         isPlaying = true;
-
+        GenerateStartingIce();
     }
 
     public void GenerateStartingIce()
@@ -56,9 +75,14 @@ public class GameManager : MonoBehaviour
 
             GameObject newIce = Instantiate(iceBlockPrefab);
             IceBlock iceBlock = newIce.GetComponent<IceBlock>();
+            iceBlock.InitIce(id, GetRandomizedDurability());
 
             newIce.transform.position = new Vector3(newPosX, newPosY, 0);
             iceblocks.Add(iceBlock);
+
+            newIce.transform.SetParent(iceFolder);
+
+            currentId++;
         }
     }
 
