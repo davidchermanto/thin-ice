@@ -16,13 +16,16 @@ public class IceBlock : MonoBehaviour
     private Color color;
     private bool steppedOn;
 
+    private GameManager gameManager;
+
     // Constants
     private float durabilityPerSteppedSecond = 0.33f;
 
-    public void InitIce(int id, float durability)
+    public void InitIce(int id, float durability, GameManager gameManager)
     {
         this.id = id;
         this.durability = durability;
+        this.gameManager = gameManager;
 
         SetRandomColor();
         StartCoroutine(DurabilityTest());
@@ -57,7 +60,8 @@ public class IceBlock : MonoBehaviour
 
     public void Die()
     {
-
+        gameManager.RequestIceDie(this);
+        StartCoroutine(AnimateFall());
     }
 
     public void BlinkDurability()
@@ -93,5 +97,11 @@ public class IceBlock : MonoBehaviour
         }
 
         Die();
+    }
+
+    private IEnumerator AnimateFall()
+    {
+        yield return new WaitForFixedUpdate();
+
     }
 }

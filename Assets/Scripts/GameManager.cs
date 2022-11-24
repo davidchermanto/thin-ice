@@ -17,27 +17,47 @@ public class GameManager : MonoBehaviour
     private int currentId = 0;
     private int furthestActivatedIceId = 0;
 
-    //
+    private int currentOhCount = 0;
+
+    // Prefabs
 
     [SerializeField] private GameObject iceBlockPrefab;
+    [SerializeField] private GameObject overheadPrefab;
+    [SerializeField] private List<Sprite> overheadSprites;
+
+    //
+
     [SerializeField] private List<IceBlock> iceblocks;
 
     [SerializeField] private Transform iceFolder;
 
-    private float maxInitialIceDurability = 60;
+    // Game Constants
+
+    private float maxInitialIceDurability = 80;
     private float minInitialIceDurability = 5;
 
     private float initialDurabilityPoints = 50;
 
-    private float minimumDurabilityPoints = 10;
-    private float durabilityVariation = 7;
+    private float minimumDurabilityPoints = 15;
+    private float durabilityVariation = 15;
 
     private float durabilityReducedPerGeneration = 0.1f;
 
-    private float initialGenerationCount = 150;
+    private int initialIceGenerationCount = 150;
+
+    private float overheadInitX = 4.44f;
+    private float overheadInitY = 0.97f;
+
+    private float xOverheadInterval = 10.24f;
+    private int initialOhGenerationCount = 6;
+
+    private int icePerOh = 25;
 
     private void Start()
     {
+        GenerateStartingOverheads();
+        GenerateStartingIce();
+
         StartGame();
     }
 
@@ -52,38 +72,62 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         isPlaying = true;
-        GenerateStartingIce();
     }
 
     public void GenerateStartingIce()
     {
-        for(int i = 0; i < initialGenerationCount; i++)
+        // First, delete all old ice first
+
+        for(int i = 0; i < initialIceGenerationCount; i++)
         {
             GenerateIce();
+        }
+    }
+
+    public void GenerateStartingOverheads()
+    {
+        // First, delete all old rocks first
+        for(int i = 0; i < initialOhGenerationCount; i++)
+        {
+            GenerateRock();
         }
     }
 
     // Generate ice uses current id to determine where to generate the ice.
     public void GenerateIce()
     {
-        if (isPlaying)
-        {
-            int id = currentId;
+        int id = currentId;
 
-            float newPosX = id * intervalX + initX;
-            float newPosY = initY;
+        float newPosX = id * intervalX + initX;
+        float newPosY = initY;
 
-            GameObject newIce = Instantiate(iceBlockPrefab);
-            IceBlock iceBlock = newIce.GetComponent<IceBlock>();
-            iceBlock.InitIce(id, GetRandomizedDurability());
+        GameObject newIce = Instantiate(iceBlockPrefab);
+        IceBlock iceBlock = newIce.GetComponent<IceBlock>();
+        iceBlock.InitIce(id, GetRandomizedDurability(), this);
 
-            newIce.transform.position = new Vector3(newPosX, newPosY, 0);
-            iceblocks.Add(iceBlock);
+        newIce.transform.position = new Vector3(newPosX, newPosY, 0);
+        iceblocks.Add(iceBlock);
 
-            newIce.transform.SetParent(iceFolder);
+        newIce.transform.SetParent(iceFolder);
 
-            currentId++;
-        }
+        currentId++;
+    }
+
+    public void GenerateRock()
+    {
+        float posX = overheadInitX + currentOhCount * xOverheadInterval;
+        float posY = overheadInitY;
+
+        GameObject newOh = Instantiate(overheadPrefab);
+        newOh.GetComponent<SpriteRenderer>().sprite = overheadSprites[Random.Range(0, overheadSprites.Count)];
+        newOh.transform.position = new Vector3(posX, posY, 0);
+
+        currentOhCount++;
+    }
+
+    public void RequestIceDie(IceBlock iceBlock)
+    {
+        iceblocks.Remove(iceBlock);
     }
 
     public float GetRandomizedDurability()

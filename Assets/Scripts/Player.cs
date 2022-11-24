@@ -6,11 +6,17 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private BoxCollider2D foot;
     [SerializeField] private Transform pickaxeAxis;
+    [SerializeField] private Rigidbody2D rb;
 
     [SerializeField] private float moveSpeed;
 
+    // Constants
+
     private float frostSlowRatio = 0.4f;
     private float frostThreshold = 60f;
+
+    private float speed = 100f;
+    private float maxSpeed = 80f;
 
     // In-game values
     private bool slowed;
@@ -47,8 +53,28 @@ public class Player : MonoBehaviour
         slowed = false;
     }
 
-    void Update()
+    void FixedUpdate()
     {
+        if (Input.GetKey(KeyCode.D))
+        {
+            MoveCharacter("right");
+        }
+        else if (Input.GetKey(KeyCode.A))
+        {
+            MoveCharacter("left");
+        }
+    }
+
+    private void MoveCharacter(string direction)
+    {
+        if (direction == "left")
+        {
+            rb.AddForce(new Vector2(-speed * Time.deltaTime, 0));
+        }
+        else if(direction == "right")
+        {
+            rb.AddForce(new Vector2(speed * Time.deltaTime, 0));
+        }
         
     }
 
