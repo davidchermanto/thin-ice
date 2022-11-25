@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private BoxCollider2D foot;
+    [SerializeField] private Collider2D foot;
     [SerializeField] private Transform pickaxeAxis;
-    [SerializeField] private Rigidbody2D rb;
 
     [SerializeField] private float moveSpeed;
 
@@ -15,8 +14,8 @@ public class Player : MonoBehaviour
     private float frostSlowRatio = 0.4f;
     private float frostThreshold = 60f;
 
-    private float speed = 100f;
-    private float maxSpeed = 80f;
+    private float speed = 20f;
+    private float maxSpeed = 40f;
 
     // In-game values
     private bool slowed;
@@ -69,13 +68,12 @@ public class Player : MonoBehaviour
     {
         if (direction == "left")
         {
-            rb.AddForce(new Vector2(-speed * Time.deltaTime, 0));
+            transform.position = new Vector3(transform.position.x - 1f * Time.fixedDeltaTime, transform.position.y);   
         }
         else if(direction == "right")
         {
-            rb.AddForce(new Vector2(speed * Time.deltaTime, 0));
+            transform.position = new Vector3(transform.position.x + 1f * Time.fixedDeltaTime, transform.position.y);
         }
-        
     }
 
     public void AddFrost(float value)
