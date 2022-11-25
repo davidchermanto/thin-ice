@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
     private float initX = -1.5f;
     private float initY = -4.2f;
 
+    Player player;
+
     // In-game values
 
     public bool isPlaying;
@@ -30,6 +32,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<IceBlock> iceblocks;
 
     [SerializeField] private Transform iceFolder;
+    [SerializeField] private Transform rockFolder;
 
     // Game Constants
 
@@ -123,6 +126,8 @@ public class GameManager : MonoBehaviour
         newOh.transform.position = new Vector3(posX, posY, 0);
 
         currentOhCount++;
+
+        newOh.transform.SetParent(rockFolder);
     }
 
     public void RequestIceDie(IceBlock iceBlock)
@@ -158,9 +163,22 @@ public class GameManager : MonoBehaviour
 
     public void UpdateFurthestActiveIce(int id)
     {
-        if(id > furthestActivatedIceId)
+        Debug.Log(currentId - id);
+
+        if (id > furthestActivatedIceId)
         {
             furthestActivatedIceId = id;
+            
+
+            if(currentId - id < 80)
+            {
+                for(int i = 0; i < icePerOh; i++)
+                {
+                    GenerateIce();
+                }
+
+                GenerateRock();
+            }
         }
     }
 }

@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     private float maxSpeed = 40f;
 
     // In-game values
+    public bool isPlaying;
+
     private bool slowed;
 
     private float currentFrost;
@@ -68,11 +70,11 @@ public class Player : MonoBehaviour
     {
         if (direction == "left")
         {
-            transform.position = new Vector3(transform.position.x - 1f * Time.fixedDeltaTime, transform.position.y);   
+            transform.position = new Vector3(transform.position.x - 5f * Time.fixedDeltaTime, transform.position.y);   
         }
         else if(direction == "right")
         {
-            transform.position = new Vector3(transform.position.x + 1f * Time.fixedDeltaTime, transform.position.y);
+            transform.position = new Vector3(transform.position.x + 5f * Time.fixedDeltaTime, transform.position.y);
         }
     }
 
