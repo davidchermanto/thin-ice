@@ -38,6 +38,10 @@ public class IceBlock : MonoBehaviour
             steppedOn = true;
             gameManager.UpdateFurthestActiveIce(id);
         }
+        else if (collision.gameObject.CompareTag("Ore"))
+        {
+            collision.gameObject.GetComponent<Ore>().AddIce(this);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)

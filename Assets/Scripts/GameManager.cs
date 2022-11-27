@@ -21,11 +21,15 @@ public class GameManager : MonoBehaviour
 
     private int currentOhCount = 0;
 
+    private int currentOreCount = 0;
+
     // Prefabs
 
     [SerializeField] private GameObject iceBlockPrefab;
     [SerializeField] private GameObject overheadPrefab;
     [SerializeField] private List<Sprite> overheadSprites;
+
+    [SerializeField] private GameObject orePrefab;
 
     //
 
@@ -33,6 +37,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Transform iceFolder;
     [SerializeField] private Transform rockFolder;
+
+    [SerializeField] private List<Ore> ores;
+
+    [SerializeField] private Transform oreFolder;
 
     // Game Constants
 
@@ -50,6 +58,8 @@ public class GameManager : MonoBehaviour
 
     private float overheadInitX = 4.44f;
     private float overheadInitY = 0.97f;
+
+    private float oreHeight = -1.9f;
 
     private float xOverheadInterval = 10.24f;
     private int initialOhGenerationCount = 6;
@@ -105,6 +115,7 @@ public class GameManager : MonoBehaviour
         float newPosY = initY;
 
         GameObject newIce = Instantiate(iceBlockPrefab);
+        newIce.name = "ice " + currentId;
         IceBlock iceBlock = newIce.GetComponent<IceBlock>();
         iceBlock.InitIce(id, GetRandomizedDurability(), this);
 
@@ -122,17 +133,53 @@ public class GameManager : MonoBehaviour
         float posY = overheadInitY;
 
         GameObject newOh = Instantiate(overheadPrefab);
+        newOh.name = "overheadRock " + currentOhCount;
         newOh.GetComponent<SpriteRenderer>().sprite = overheadSprites[Random.Range(0, overheadSprites.Count)];
         newOh.transform.position = new Vector3(posX, posY, 0);
 
         currentOhCount++;
 
         newOh.transform.SetParent(rockFolder);
+
+        // Generate 1 or 2 ores as well on the rock.
+        float oposX = overheadInitX + currentOhCount * xOverheadInterval - Random.Range(0.5f, 0.8f) * xOverheadInterval;
+        float oposY = oreHeight;
+
+        GenerateRandomOre(oposX, oposY);
+
+        if(Random.Range(0, 10) > 3)
+        {
+            oposX = overheadInitX + currentOhCount * xOverheadInterval + Random.Range(0.5f, 0.8f) * xOverheadInterval;
+
+            GenerateRandomOre(oposX, oposY);
+        }
+    }
+
+    public void GenerateRandomOre(float x, float y)
+    {
+        // Choices are emerald, silver, gold, moldalium, electrite, heat ruby, and diamond
+        GameObject newOre = Instantiate(orePrefab);
+
+        newOre.name = "ore "+currentOreCount;
+        newOre.transform.position = new Vector3(x, y);
+        newOre.transform.SetParent(oreFolder);
+
+        Ore ore = newOre.GetComponent<Ore>();
+        ore.Initialize("emerald", null, 2, 3, 1, this);
+
+        currentOreCount++;
+
+        ores.Add(ore);
     }
 
     public void RequestIceDie(IceBlock iceBlock)
     {
         iceblocks.Remove(iceBlock);
+    }
+
+    public void RequestOreDie(Ore ore)
+    {
+        ores.Remove(ore);
     }
 
     public float GetRandomizedDurability()
@@ -163,8 +210,6 @@ public class GameManager : MonoBehaviour
 
     public void UpdateFurthestActiveIce(int id)
     {
-        Debug.Log(currentId - id);
-
         if (id > furthestActivatedIceId)
         {
             furthestActivatedIceId = id;

@@ -70,11 +70,11 @@ public class Player : MonoBehaviour
     {
         if (direction == "left")
         {
-            transform.position = new Vector3(transform.position.x - 5f * Time.fixedDeltaTime, transform.position.y);   
+            transform.position = new Vector3(transform.position.x - 15f * Time.fixedDeltaTime, transform.position.y);   
         }
         else if(direction == "right")
         {
-            transform.position = new Vector3(transform.position.x + 5f * Time.fixedDeltaTime, transform.position.y);
+            transform.position = new Vector3(transform.position.x + 15f * Time.fixedDeltaTime, transform.position.y);
         }
     }
 
