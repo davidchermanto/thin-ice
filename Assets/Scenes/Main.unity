@@ -318,6 +318,13 @@ MonoBehaviour:
   - {fileID: 21300000, guid: d6369627008395a45915ceae233db9ef, type: 3}
   orePrefab: {fileID: 803156463765675881, guid: 17781fb33e837ce45901cf7a08f3e83c,
     type: 3}
+  oreSprites:
+  - {fileID: 21300000, guid: 476bba2312ff50d4a97592864e90ded6, type: 3}
+  - {fileID: 21300000, guid: 58fcdbe497777aa448455fcd376b2d82, type: 3}
+  - {fileID: 21300000, guid: c4b25a4684e0eda40bcd51a967bc2824, type: 3}
+  - {fileID: 21300000, guid: 2e0cd6cc0685ecd469585f52b1c5a986, type: 3}
+  - {fileID: 21300000, guid: 1b3a11d2f843ad540bcc842f0ecd2333, type: 3}
+  - {fileID: 21300000, guid: 36c963312482183439d46ffb0ab8024a, type: 3}
   iceblocks: []
   iceFolder: {fileID: 102415674}
   rockFolder: {fileID: 55777178}
@@ -838,7 +845,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 777522187}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.375724, y: 0.29504132, z: -10}
+  m_LocalPosition: {x: 2.377732, y: 0.29504132, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 809155792}

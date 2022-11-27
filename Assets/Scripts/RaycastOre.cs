@@ -24,7 +24,7 @@ public class RaycastOre : MonoBehaviour
                 if (hit.collider.gameObject.CompareTag("Ore") && dist <= hitDistance)
                 {
                     Ore ore = hit.collider.GetComponent<Ore>();
-                    ore.VibrateDamage();
+                    ore.HitOre();
 
                     Debug.Log("hit");
                 }

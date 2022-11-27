@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering.Universal;
 
 public class Ore : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
     [SerializeField] private string oreName;
     [SerializeField] private Sprite oreSprite;
+    [SerializeField] private Color color;
 
     // Vibration / Combat
     [SerializeField] private int hitsToDestroy;
@@ -16,11 +18,15 @@ public class Ore : MonoBehaviour
 
     // Pre-assigned
     [SerializeField] private CircleCollider2D oreCollider2D;
+    [SerializeField] private SpriteRenderer gemSprite;
+    [SerializeField] private Light2D glow;
+    [SerializeField] private GameObject hitEffect;
 
     //
     [SerializeField] private List<IceBlock> iceBlocksInRange;
 
-    public void Initialize(string name, Sprite oreSprite, int hitsToDestroy, float damageToIce, float damageRadius, GameManager gameManager)
+    public void Initialize(string name, Sprite oreSprite, Color color, int hitsToDestroy, float damageToIce, 
+        float damageRadius, GameManager gameManager)
     {
         this.oreName = name;
         this.oreSprite = oreSprite;
@@ -32,7 +38,9 @@ public class Ore : MonoBehaviour
 
         oreCollider2D.radius = damageRadius + 1.5f;
 
-        //todo: look for ice inside the collider
+        gemSprite.sprite = oreSprite;
+        gemSprite.color = color;
+        glow.color = color;
     }
 
     public void HitOre()

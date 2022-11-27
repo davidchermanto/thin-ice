@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<Sprite> overheadSprites;
 
     [SerializeField] private GameObject orePrefab;
+    [SerializeField] private List<Sprite> oreSprites;
 
     //
 
@@ -165,7 +166,7 @@ public class GameManager : MonoBehaviour
         newOre.transform.SetParent(oreFolder);
 
         Ore ore = newOre.GetComponent<Ore>();
-        ore.Initialize("emerald", null, 2, 3, 1, this);
+        ore.Initialize("emerald", oreSprites[Random.Range(0, oreSprites.Count)], new Color(0.5f, 1f, 0.5f), 2, 3, 1, this);
 
         currentOreCount++;
 
@@ -213,7 +214,6 @@ public class GameManager : MonoBehaviour
         if (id > furthestActivatedIceId)
         {
             furthestActivatedIceId = id;
-            
 
             if(currentId - id < 80)
             {
