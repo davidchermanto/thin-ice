@@ -19,7 +19,8 @@ public class IceBlock : MonoBehaviour
     private GameManager gameManager;
 
     // Constants
-    private float durabilityPerSteppedSecond = 0.33f;
+    private float durabilityWhenSteppedOn = 2f;
+    private float durabilityPerSteppedSecond = 0.66f;
 
     public void InitIce(int id, float durability, GameManager gameManager)
     {
@@ -36,9 +37,11 @@ public class IceBlock : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             steppedOn = true;
+            durability -= durabilityWhenSteppedOn;
             gameManager.UpdateFurthestActiveIce(id);
+            StartCoroutine(Down());
         }
-        else if (collision.gameObject.CompareTag("Ore"))
+        else if (collision.gameObject.CompareTag("OreMain"))
         {
             collision.gameObject.GetComponent<Ore>().AddIce(this);
         }
@@ -49,12 +52,53 @@ public class IceBlock : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             steppedOn = false;
+            StartCoroutine(Up());
+        }
+    }
+
+    private IEnumerator Down()
+    {
+        float downTarget = -4.3f;
+        float downTime = 0.3f;
+        StopCoroutine(Up());
+
+        Vector3 currentPos = transform.position;
+        Vector3 targetPos = new Vector3(currentPos.x, downTarget, 0);
+
+        float time = 0;
+
+        while(time < 1)
+        {
+            time += Time.deltaTime / downTime;
+            transform.position = Vector3.Lerp(currentPos, targetPos, time);
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private IEnumerator Up()
+    {
+        float upTarget = -4.2f;
+        float upTime = 0.8f;
+        StopCoroutine(Down());
+
+        Vector3 currentPos = transform.position;
+        Vector3 targetPos = new Vector3(currentPos.x, upTarget, 0);
+
+        float time = 0;
+
+        while (time < 1)
+        {
+            time += Time.deltaTime / upTime;
+            transform.position = Vector3.Lerp(currentPos, targetPos, time);
+
+            yield return new WaitForEndOfFrame();
         }
     }
 
     private void SetRandomColor()
     {
-        float a = Random.Range(0.5f, 0.9f);
+        float a = durability / 100;
         float r = Random.Range(0.4f, 0.7f);
         float g = Random.Range(0.7f, 0.8f);
         float b = Random.Range(0.9f, 1f);
@@ -74,16 +118,17 @@ public class IceBlock : MonoBehaviour
 
     }
 
-    public IEnumerator Animate()
+    public void TakeVibrationDamage(float damage)
     {
-        float maxUp = 0.15f;
-        bool rising = false;
+        durability -= damage;
 
-        while (gameObject.activeSelf)
+        if (durability <= 0)
         {
-
-            yield return new WaitForFixedUpdate();
+            Die();
         }
+
+        float a = durability / 100;
+        spriteRenderer.color = new Color(color.r, color.g, color.b, a);
     }
 
     private IEnumerator DurabilityTest()
@@ -96,12 +141,18 @@ public class IceBlock : MonoBehaviour
             {
                 elapsed = Time.deltaTime * durabilityPerSteppedSecond;
                 durability -= elapsed;
+
+                if(durability <= 0)
+                {
+                    Die();
+                }
+
+                float a = durability / 100;
+                spriteRenderer.color = new Color(color.r, color.g, color.b, a);
             }
 
             yield return new WaitForFixedUpdate();
         }
-
-        Die();
     }
 
     private IEnumerator AnimateFall()

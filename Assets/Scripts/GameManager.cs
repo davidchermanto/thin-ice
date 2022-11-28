@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     private float initX = -1.5f;
     private float initY = -4.2f;
 
-    Player player;
+    [SerializeField] Player player;
 
     // In-game values
 
@@ -45,15 +45,15 @@ public class GameManager : MonoBehaviour
 
     // Game Constants
 
-    private float maxInitialIceDurability = 80;
-    private float minInitialIceDurability = 5;
+    private float maxInitialIceDurability = 90;
+    private float minInitialIceDurability = 15;
 
-    private float initialDurabilityPoints = 50;
+    private float initialDurabilityPoints = 30;
 
     private float minimumDurabilityPoints = 15;
     private float durabilityVariation = 15;
 
-    private float durabilityReducedPerGeneration = 0.1f;
+    private float durabilityReducedPerGeneration = 0.07f;
 
     private int initialIceGenerationCount = 150;
 
@@ -71,6 +71,8 @@ public class GameManager : MonoBehaviour
     {
         GenerateStartingOverheads();
         GenerateStartingIce();
+
+        player.Initialize();
 
         StartGame();
     }
@@ -148,7 +150,7 @@ public class GameManager : MonoBehaviour
 
         GenerateRandomOre(oposX, oposY);
 
-        if(Random.Range(0, 10) > 3)
+        if(Random.Range(0, 10) > 1)
         {
             oposX = overheadInitX + currentOhCount * xOverheadInterval + Random.Range(0.5f, 0.8f) * xOverheadInterval;
 

@@ -15,18 +15,19 @@ public class RaycastOre : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10)), Vector2.zero);
+            RaycastHit2D[] hit = Physics2D.RaycastAll(Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10)), Vector2.zero);
 
-            if (hit.collider != null)
+            foreach(RaycastHit2D hitCollider in hit)
             {
-                float dist = Vector3.Distance(hit.collider.transform.position, player.transform.position);
-
-                if (hit.collider.gameObject.CompareTag("Ore") && dist <= hitDistance)
+                if (hitCollider.collider != null)
                 {
-                    Ore ore = hit.collider.GetComponent<Ore>();
-                    ore.HitOre();
+                    float dist = Vector3.Distance(hitCollider.collider.transform.position, player.transform.position);
 
-                    Debug.Log("hit");
+                    if (hitCollider.collider.gameObject.CompareTag("Ore") && dist <= hitDistance)
+                    {
+                        OreCollider ore = hitCollider.collider.GetComponent<OreCollider>();
+                        ore.HitOre();
+                    }
                 }
             }
         }
