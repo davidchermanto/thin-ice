@@ -99,12 +99,14 @@ public class IceBlock : MonoBehaviour
     private void SetRandomColor()
     {
         float a = durability / 100;
-        float r = Random.Range(0.4f, 0.7f);
+        float r = Random.Range(0.5f, 0.6f);
         float g = Random.Range(0.7f, 0.8f);
         float b = Random.Range(0.9f, 1f);
 
         color = new Color(r, g, b, a);
         spriteRenderer.color = color;
+
+        UpdateAlpha();
     }
 
     public void Die()
@@ -127,8 +129,20 @@ public class IceBlock : MonoBehaviour
             Die();
         }
 
-        float a = durability / 100;
-        spriteRenderer.color = new Color(color.r, color.g, color.b, a);
+        UpdateAlpha();
+    }
+
+    private void UpdateAlpha()
+    {
+        if(durability > 30)
+        {
+            spriteRenderer.color = new Color(color.r, color.g, color.b, 0.9f);
+        }
+        else
+        {
+            float a = (durability / 100) * 0.9f;
+            spriteRenderer.color = new Color(color.r, color.g, color.b, a);
+        }
     }
 
     private IEnumerator DurabilityTest()
@@ -147,8 +161,7 @@ public class IceBlock : MonoBehaviour
                     Die();
                 }
 
-                float a = durability / 100;
-                spriteRenderer.color = new Color(color.r, color.g, color.b, a);
+                UpdateAlpha();
             }
 
             yield return new WaitForFixedUpdate();

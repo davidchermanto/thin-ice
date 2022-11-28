@@ -11,7 +11,7 @@ public class Hit_Light : MonoBehaviour
     private float inTime = 0.15f;
     private float inTime2 = 2f;
 
-    private float fadeTime = 1.2f;
+    private float fadeTime = 0.8f;
     private float deleteTime = 2f;
 
     private float scaleUp = 2.4f;

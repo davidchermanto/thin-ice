@@ -48,6 +48,13 @@ public class Ore : MonoBehaviour
 
     public void HitOre()
     {
+        StartCoroutine(HitCoroutine());
+    }
+
+    private IEnumerator HitCoroutine()
+    {
+        yield return new WaitForEndOfFrame();
+
         // Effects
         GameObject hit = Instantiate(hitEffect);
         hit.transform.position = transform.position;
@@ -61,15 +68,10 @@ public class Ore : MonoBehaviour
         VibrateDamage();
         hitsToDestroy -= 1;
 
-        if(hitsToDestroy <= 0)
+        if (hitsToDestroy <= 0)
         {
             Die();
         }
-    }
-
-    private IEnumerator HitEffect()
-    {
-        yield return new WaitForEndOfFrame();
     }
 
     public void VibrateDamage()

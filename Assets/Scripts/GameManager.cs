@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     private float initY = -4.2f;
 
     [SerializeField] Player player;
+    [SerializeField] Parallax parallax;
 
     // In-game values
 
@@ -73,6 +74,7 @@ public class GameManager : MonoBehaviour
         GenerateStartingIce();
 
         player.Initialize();
+        parallax.Initialize();
 
         StartGame();
     }
