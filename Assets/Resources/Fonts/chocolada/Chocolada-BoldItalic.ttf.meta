@@ -1,0 +1,25 @@
+fileFormatVersion: 2
+guid: a78a56a64e5c0f34a85fe021f1305a5b
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Chocolada
+  fontNames:
+  - Chocolada
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 24a84e625fc815e4cae9c52a6b575f8a, type: 3}
+  - {fileID: 12800000, guid: 42ae7d48b16b21b42b9eadfacc0538dc, type: 3}
+  - {fileID: 12800000, guid: 71a4126e99db50043b48b5dbb7c71f9c, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

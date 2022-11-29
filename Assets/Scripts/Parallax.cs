@@ -31,7 +31,7 @@ public class Parallax : MonoBehaviour
     private float initialX = -15;
     private float initialY = -3f;
     private float varY = 0.4f;
-    private float generationTolerance = 100;
+    private float generationTolerance = 40;
 
     public void Initialize()
     {
@@ -42,18 +42,18 @@ public class Parallax : MonoBehaviour
         }
     }
 
-    void Update()
+    void LateUpdate()
     {
         front.localPosition = new Vector3(-cam.transform.position.x * parallaxFrontRatio, 0);
         back.localPosition = new Vector3(-cam.transform.position.x * parallaxBackRatio, 0);
 
         Vector3 camPos = cam.transform.position;
-        if(camPos.x - lastCheckPointFront < generationTolerance && !(camPos.x < lastCheckPointFront))
+        if(lastCheckPointFront - camPos.x < generationTolerance)
         {
             GenerateFront();
         }
 
-        if (camPos.x - lastCheckPointBack < generationTolerance && !(camPos.x < lastCheckPointBack))
+        if (lastCheckPointBack - camPos.x < generationTolerance)
         {
             GenerateBack();
         }

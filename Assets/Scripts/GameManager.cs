@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviour
 
     private float durabilityReducedPerGeneration = 0.07f;
 
-    private int initialIceGenerationCount = 150;
+    private int initialIceGenerationCount = 75;
 
     private float overheadInitX = 4.44f;
     private float overheadInitY = 0.97f;
@@ -64,9 +64,52 @@ public class GameManager : MonoBehaviour
     private float oreHeight = -1.9f;
 
     private float xOverheadInterval = 10.24f;
-    private int initialOhGenerationCount = 6;
+    private int initialOhGenerationCount = 3;
 
     private int icePerOh = 25;
+
+    public struct OreType
+    {
+        public string name;
+        public float depth;
+        public int value;
+        public Color color;
+        public int hitsToDestroy;
+        public float damageToIce;
+        public float damageRadius;
+        public float weight;
+
+        public OreType(string name, float depth, int value, Color color, 
+            int hitsToDestroy, float damageToIce, float damageRadius, float weight)
+        {
+            this.name = name;
+            this.depth = depth;
+            this.value = value;
+            this.color = color;
+            this.hitsToDestroy = hitsToDestroy;
+            this.damageToIce = damageToIce;
+            this.damageRadius = damageRadius;
+            this.weight = weight;
+        }
+    }
+
+    // 0/ 0 - 30m = emerald, weight 7
+    // 1/ 30+ = gold, weight 5
+    // 2/ 30+ = silver, weight 10
+    // 3/ 80+ = moldalium, weight 5
+    // 4/ 80+ = electrite, weight 5
+    // 5/ 150+ = heat ruby, weight 10
+    // 6/ 200+ = diamond, weight 15
+
+    [SerializeField] private List<OreType> oreTypes = new List<OreType>() { 
+        new OreType("emerald", -10, 50, new Color(0.5f, 1f, 0.5f), 2, 3, 1, 7),
+        new OreType("gold", -10, 75, new Color(1f, 0.8f, 0f), 3, 4, 1, 5),
+        new OreType("silver", -10, 50, new Color(0.9f, 0.9f, 1f), 2, 2, 2, 10),
+        new OreType("moldalium", 80, 100, new Color(0.3f, 0.3f, 1f), 2, 8, 1, 5),
+        new OreType("electrite", 80, 100, new Color(1f, 0.45f, 0.75f), 3, 6, 1, 5),
+        new OreType("heat ruby", 150, 150, new Color(1f, 0.2f, 0.2f), 4, 5, 1, 10),
+        new OreType("diamond", 150, 250, new Color(0.6f, 1f, 1f), 5, 4, 1, 15)
+    };
 
     private void Start()
     {
@@ -170,7 +213,23 @@ public class GameManager : MonoBehaviour
         newOre.transform.SetParent(oreFolder);
 
         Ore ore = newOre.GetComponent<Ore>();
-        ore.Initialize("emerald", oreSprites[Random.Range(0, oreSprites.Count)], new Color(0.5f, 1f, 0.5f), 2, 3, 1, this);
+
+        float depth = player.transform.position.x;
+
+        List<OreType> possibleOres = new List<OreType>();
+        foreach (OreType oreType in oreTypes)
+        {
+            if (depth >= oreType.depth)
+            {
+                possibleOres.Add(oreType);
+            }
+        }
+
+        int selection = Random.Range(0, possibleOres.Count);
+        OreType selectedOre = possibleOres[selection];
+
+        ore.Initialize(selectedOre.name, oreSprites[Random.Range(0, oreSprites.Count)], selectedOre.color,
+            selectedOre.hitsToDestroy, selectedOre.damageToIce, selectedOre.damageRadius, this);
 
         currentOreCount++;
 

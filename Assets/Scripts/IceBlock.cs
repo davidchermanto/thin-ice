@@ -19,8 +19,12 @@ public class IceBlock : MonoBehaviour
     private GameManager gameManager;
 
     // Constants
-    private float durabilityWhenSteppedOn = 2f;
+    private float durabilityWhenSteppedOn = 1f;
     private float durabilityPerSteppedSecond = 0.66f;
+
+    private float durabilityBeforeAlphaChange = 15;
+    private float maxAlpha = 0.9f;
+    private float minAlpha = 0.5f;
 
     public void InitIce(int id, float durability, GameManager gameManager)
     {
@@ -112,7 +116,7 @@ public class IceBlock : MonoBehaviour
     public void Die()
     {
         gameManager.RequestIceDie(this);
-        StartCoroutine(AnimateFall());
+        StartCoroutine(AnimateDeath());
     }
 
     public void BlinkDurability()
@@ -134,13 +138,14 @@ public class IceBlock : MonoBehaviour
 
     private void UpdateAlpha()
     {
-        if(durability > 30)
+        if(durability > durabilityBeforeAlphaChange)
         {
-            spriteRenderer.color = new Color(color.r, color.g, color.b, 0.9f);
+            spriteRenderer.color = new Color(color.r, color.g, color.b, maxAlpha);
         }
         else
         {
-            float a = (durability / 100) * 0.9f;
+            float a = (durability / 100) * maxAlpha;
+            if(a < minAlpha) { a = minAlpha;  }
             spriteRenderer.color = new Color(color.r, color.g, color.b, a);
         }
     }
@@ -168,9 +173,10 @@ public class IceBlock : MonoBehaviour
         }
     }
 
-    private IEnumerator AnimateFall()
+    private IEnumerator AnimateDeath()
     {
         yield return new WaitForFixedUpdate();
 
+        
     }
 }
