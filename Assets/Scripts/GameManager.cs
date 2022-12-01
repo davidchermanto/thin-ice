@@ -145,7 +145,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-
+        MusicManager.Instance.Play(0);
     }
 
     private void Update()
@@ -155,8 +155,11 @@ public class GameManager : MonoBehaviour
             currentDepth = (float)System.Math.Round(player.transform.position.x + 2.55f, 1);
             currentFrost += Time.deltaTime * frostPerSecond;
             frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0, 0.1f, currentFrost / 100));
-
-            if(currentFrost > 100) { DieFrost(); }
+            
+            if(currentFrost > 0) { MusicManager.Instance.Play(1); }
+            if (currentFrost > 25) { MusicManager.Instance.Play(2); }
+            if (currentFrost > 50) { MusicManager.Instance.Play(3); }
+            if (currentFrost > 100) { DieFrost(); }
 
             if (!player.moving)
             {
@@ -173,6 +176,8 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        SFXManager.Instance.PlayClip(0);
+
         uiManager.TurnOffTutorial();
         ResetAll();
 
@@ -220,6 +225,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Sonar()
     {
+        SFXManager.Instance.PlayClip(4);
         int iceDeleteRange = 40;
 
         int higherCounter = furthestActivatedIceId;
@@ -271,6 +277,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Construct()
     {
+        SFXManager.Instance.PlayClip(3);
         int iceDeleteRange = 20;
 
         int higherCounter = furthestActivatedIceId;
@@ -566,6 +573,7 @@ public class GameManager : MonoBehaviour
     public void RequestOreDie(Ore ore)
     {
         ores.Remove(ore);
+        SFXManager.Instance.PlayClip(1, 1, true);
         wealth += ore.value;
 
         switch (ore.oreName)

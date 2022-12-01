@@ -49,6 +49,8 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator TutorialOn()
     {
+        MusicManager.Instance.Play(0);
+
         float blackTime = 0.3f;
         float blackHold = 0.5f;
 

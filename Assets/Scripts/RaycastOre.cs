@@ -30,6 +30,7 @@ public class RaycastOre : MonoBehaviour
 
                     if (Input.GetMouseButtonDown(0) && dist <= hitDistance)
                     {
+                        SFXManager.Instance.PlayClip(2);
                         ore.HitOre();
                     }
 

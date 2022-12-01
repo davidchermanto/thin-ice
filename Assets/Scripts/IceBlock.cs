@@ -171,6 +171,7 @@ public class IceBlock : MonoBehaviour
     {
         GameObject effect = Instantiate(explodeParticles);
         effect.transform.position = transform.position;
+        SFXManager.Instance.PlayClip(1, 0.2f, true);
         gameObject.SetActive(false);
     }
 
