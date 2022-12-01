@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviour
         {
             currentDepth = (float)System.Math.Round(player.transform.position.x + 2.55f, 1);
             currentFrost += Time.deltaTime * frostPerSecond;
-            frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0, 0.1f, currentFrost / 100));
+            frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0.02f, 0.2f, currentFrost / 100));
             
             if(currentFrost > 0) { MusicManager.Instance.Play(1); }
             if (currentFrost > 25) { MusicManager.Instance.Play(2); }
@@ -503,7 +503,7 @@ public class GameManager : MonoBehaviour
         {
             time += Time.deltaTime * freezeTime;
 
-            frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0.1f, 0.3f, time));
+            frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0.2f, 0.4f, time));
 
             yield return new WaitForEndOfFrame();
         }
