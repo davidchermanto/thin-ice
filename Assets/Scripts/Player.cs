@@ -18,8 +18,8 @@ public class Player : MonoBehaviour
     private float speed = 2.5f;
 
     private float rotateSpeed = 340f;
-    [SerializeField] private bool moving = false;
-    [SerializeField] private bool goingRight = true;
+    [SerializeField] public bool moving = false;
+    [SerializeField] public bool goingRight = true;
 
     private float maxCartDisplacement = 0.02f;
     private float maxDisplacementPerSecond = 0.36f;
@@ -27,36 +27,14 @@ public class Player : MonoBehaviour
     // In-game values
     public bool isPlaying;
 
-    private bool slowed;
-
-    private int currentEmerald;
-    private int currentGold;
-    private int currentSilver;
-    private int currentVibralite;
-    private int currentMoldalium;
-    private int currentElectrite;
-    private int currentRuby;
-    private int currentDiamond;
+    public bool accRight;
+    public bool accLeft;
 
     public void Initialize()
     {
         StartCoroutine(Breathe());
         StartCoroutine(WheelRotate());
         isPlaying = true;
-    }
-
-    public void ResetCurrentValues()
-    {
-        currentDiamond = 0;
-        currentElectrite = 0;
-        currentRuby = 0;
-        currentMoldalium = 0;
-        currentVibralite = 0;
-        currentSilver = 0;
-        currentGold = 0;
-        currentEmerald = 0;
-
-        slowed = false;
     }
 
     void FixedUpdate()
@@ -69,14 +47,9 @@ public class Player : MonoBehaviour
 
         if (isPlaying && moving)
         {
-            if (Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.D) || accRight)
             {
                 MoveCharacter("right");
-            }
-            
-            if (Input.GetKey(KeyCode.A))
-            {
-                MoveCharacter("left");
             }
 
             transform.position = new Vector3(transform.position.x + baseSpeed * Time.fixedDeltaTime, transform.position.y);
@@ -133,7 +106,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private IEnumerator WheelRotate()
+    public IEnumerator WheelRotate()
     {
         Vector3 cartPosLimit = cart.transform.localPosition + new Vector3(maxCartDisplacement, maxCartDisplacement);
 

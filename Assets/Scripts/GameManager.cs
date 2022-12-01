@@ -28,22 +28,25 @@ public class GameManager : MonoBehaviour
     private float currentFrost = 0;
     private float currentDepth = 0;
 
-    private int sonarCount = 5;
+    private int sonarCount = 3;
     private int constructCount = 3;
 
     private int currentEmerald;
     private int currentGold;
     private int currentSilver;
-    private int currentVibralite;
     private int currentMoldalium;
     private int currentElectrite;
     private int currentRuby;
     private int currentDiamond;
+    private int currentStellium;
+
+    private float lastDurability = 0;
+    private bool durabilityDown = false;
 
     private int wealth;
 
     // Prefabs
-
+    [Header("Prefab")]
     [SerializeField] private GameObject iceBlockPrefab;
     [SerializeField] private GameObject overheadPrefab;
     [SerializeField] private List<Sprite> overheadSprites;
@@ -51,8 +54,10 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject orePrefab;
     [SerializeField] private List<Sprite> oreSprites;
 
-    //
+    [SerializeField] private GameObject sonarEffect;
 
+    //
+    [Header("Folders")]
     [SerializeField] private List<IceBlock> iceblocks;
 
     [SerializeField] private Transform iceFolder;
@@ -62,19 +67,21 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private Transform oreFolder;
 
+    [SerializeField] private GameObject vCam;
+
     // Game Constants
 
-    private float maxInitialIceDurability = 90;
-    private float minInitialIceDurability = 20;
+    private float maxInitialIceDurability = 45;
+    private float minInitialIceDurability = 16;
 
-    private float initialDurabilityPoints = 40;
+    private float initialDurabilityPoints = 30;
 
-    private float minimumDurabilityPoints = 30;
-    private float durabilityVariation = 15;
+    private float minBaseDurability = 25;
+    private float durabilityJumpVariationMax = 5;
 
     private float durabilityReducedPerGeneration = 0.07f;
 
-    private int initialIceGenerationCount = 75;
+    private int initialIceGenerationCount = 25;
 
     private float overheadInitX = 4.44f;
     private float overheadInitY = 0.97f;
@@ -82,14 +89,14 @@ public class GameManager : MonoBehaviour
     private float oreHeight = -1.9f;
 
     private float xOverheadInterval = 10.24f;
-    private int initialOhGenerationCount = 3;
+    private int initialOhGenerationCount = 1;
 
     private int icePerOh = 25;
 
     private float frostPerSecond = 1f;
 
     // Gems?
-    private float frostDecreasePerRubyHit = 4f;
+    private float frostDecreasePerRubyHit = 5f;
 
     public struct OreType
     {
@@ -125,13 +132,14 @@ public class GameManager : MonoBehaviour
     // 6/ 200+ = diamond, weight 15
 
     [SerializeField] private List<OreType> oreTypes = new List<OreType>() { 
-        new OreType("emerald", -10, 50, new Color(0.5f, 1f, 0.5f), 2, 3, 1, 7),
-        new OreType("gold", 10, 75, new Color(1f, 0.8f, 0f), 3, 4, 1.3f, 5),
-        new OreType("silver", -10, 50, new Color(0.9f, 0.9f, 1f), 2, 2, 2, 10),
-        new OreType("moldalium", 50, 100, new Color(0.3f, 0.3f, 1f), 2, 8, 1.5f, 5),
-        new OreType("electrite", 50, 100, new Color(1f, 0.45f, 0.75f), 3, 6, 1.7f, 5),
-        new OreType("heat ruby", 100, 150, new Color(1f, 0.2f, 0.2f), 4, 5, 2f, 10),
-        new OreType("diamond", 100, 250, new Color(0.6f, 1f, 1f), 5, 4, 1, 15)
+        new OreType("emerald", -10, 50, new Color(0.5f, 1f, 0.5f), 2, 3, 1, 3),
+        new OreType("gold", 0, 75, new Color(1f, 0.8f, 0f), 3, 4, 1.3f, 5),
+        new OreType("silver", -10, 50, new Color(0.9f, 0.9f, 1f), 2, 2, 2, 3),
+        new OreType("moldalium", 20, 100, new Color(0.3f, 0.3f, 1f), 2, 8, 1.5f, 7),
+        new OreType("electrite", 30, 100, new Color(1f, 0.45f, 0.75f), 3, 6, 1.7f, 7),
+        new OreType("heat ruby", 50, 150, new Color(1f, 0.2f, 0.2f), 4, 5, 2f, 8),
+        new OreType("diamond", 70, 250, new Color(0.6f, 1f, 1f), 5, 4, 1, 10),
+        new OreType("stellium", 200, 500, new Color(1f, 1f, 1f), 7, 3, 2.4f, 15)
     };
 
     private void Start()
@@ -152,7 +160,16 @@ public class GameManager : MonoBehaviour
             currentDepth = (float)System.Math.Round(player.transform.position.x + 2.55f, 1);
             currentFrost += Time.deltaTime * frostPerSecond;
 
+            if (!player.moving)
+            {
+                currentFrost = 0;
+            }
+
             uiManager.UpdateGameValues(wealth, currentFrost, currentDepth, sonarCount, constructCount);
+            uiManager.UpdateWealthMenu(currentEmerald, currentEmerald * oreTypes[0].value, currentSilver, currentSilver * oreTypes[2].value,
+                currentGold, currentGold * oreTypes[1].value, currentElectrite, currentElectrite * oreTypes[4].value, currentMoldalium,
+                currentMoldalium * oreTypes[3].value, currentRuby, currentRuby * oreTypes[5].value, currentDiamond, currentDiamond *
+                oreTypes[6].value, currentStellium, currentStellium * oreTypes[7].value);
         }
     }
 
@@ -160,6 +177,7 @@ public class GameManager : MonoBehaviour
     {
         isPlaying = true;
         player.isPlaying = true;
+        vCam.SetActive(true);
     }
 
     public void GenerateStartingIce()
@@ -179,6 +197,16 @@ public class GameManager : MonoBehaviour
         {
             GenerateRock();
         }
+    }
+
+    public void ActivateSonar()
+    {
+
+    }
+
+    public void ActivateConstruct()
+    {
+
     }
 
     // Generate ice uses current id to determine where to generate the ice.
@@ -217,7 +245,7 @@ public class GameManager : MonoBehaviour
         newOh.transform.SetParent(rockFolder);
 
         // Generate 1 or 2 ores as well on the rock.
-        float oposX = overheadInitX + currentOhCount * xOverheadInterval - Random.Range(0.5f, 0.8f) * xOverheadInterval;
+        float oposX = overheadInitX + currentOhCount * xOverheadInterval - Random.Range(0.45f, 0.65f) * xOverheadInterval;
         float oposY = oreHeight;
 
         GenerateRandomOre(oposX, oposY);
@@ -225,6 +253,13 @@ public class GameManager : MonoBehaviour
         if(Random.Range(0, 10) > 1)
         {
             oposX = overheadInitX + currentOhCount * xOverheadInterval - Random.Range(0.1f, 0.3f) * xOverheadInterval;
+
+            GenerateRandomOre(oposX, oposY);
+        }
+
+        if (Random.Range(0, 10) > 1)
+        {
+            oposX = overheadInitX + currentOhCount * xOverheadInterval - Random.Range(0.75f, 0.9f) * xOverheadInterval;
 
             GenerateRandomOre(oposX, oposY);
         }
@@ -263,9 +298,79 @@ public class GameManager : MonoBehaviour
         ores.Add(ore);
     }
 
-    public void RequestIceDie(IceBlock iceBlock)
+    // Player loses?
+    public void Die(IceBlock iceBlock)
     {
-        iceblocks.Remove(iceBlock);
+        if (!player.accLeft)
+        {
+            isPlaying = false;
+            player.isPlaying = false;
+            player.StopAllCoroutines();
+            StartCoroutine(DeathAnimation());
+        }
+    }
+
+    private IEnumerator DeathAnimation()
+    {
+        StartCoroutine(DeleteIces());
+        vCam.SetActive(false);
+
+        yield return new WaitForSeconds(2f);
+
+        float time = 0;
+        float fallDuration = 1;
+        float fallSpeed = 15;
+        while(time < 1)
+        {
+            time += Time.deltaTime * fallDuration;
+
+            player.transform.position = new Vector3(player.transform.position.x, 
+                player.transform.position.y - fallSpeed * Time.deltaTime);
+
+            yield return new WaitForEndOfFrame();
+        }
+
+    }
+
+    private IEnumerator DeleteIces()
+    {
+        int iceDeleteRange = 30;
+
+        int higherCounter = furthestActivatedIceId;
+        int lowerCounter = furthestActivatedIceId - 1;
+
+        bool higherEnd = false;
+        bool lowerEnd = false;
+
+        for(int i = 0; i < iceDeleteRange; i++)
+        {
+            if (!higherEnd)
+            {
+                if (iceblocks[higherCounter].isActiveAndEnabled)
+                {
+                    iceblocks[higherCounter].iceCollider.enabled = false;
+                    iceblocks[higherCounter].Explode();
+                }
+
+                higherCounter++;
+            }
+
+            if (!lowerEnd)
+            {
+                if (iceblocks[lowerCounter].isActiveAndEnabled)
+                {
+                    iceblocks[lowerCounter].iceCollider.enabled = false;
+                    iceblocks[lowerCounter].Explode();
+                }
+
+                lowerCounter--;
+            }
+
+            if(higherCounter > iceblocks.Count) { higherEnd = true; }
+            if(lowerCounter < 1) { lowerEnd = true; }
+
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     public void RequestOreDie(Ore ore)
@@ -273,7 +378,7 @@ public class GameManager : MonoBehaviour
         ores.Remove(ore);
         wealth += ore.value;
 
-        switch (ore.name)
+        switch (ore.oreName)
         {
             case "emerald":
                 currentEmerald++;
@@ -286,15 +391,21 @@ public class GameManager : MonoBehaviour
                 break;
             case "moldalium":
                 currentMoldalium++;
+                constructCount++;
                 break;
             case "electrite":
                 currentElectrite++;
+                sonarCount++;
                 break;
             case "heat ruby":
                 currentRuby++;
+                currentFrost -= frostDecreasePerRubyHit;
                 break;
             case "diamond":
                 currentDiamond++;
+                break;
+            case "stellium":
+                currentStellium++;
                 break;
             default:
                 break;
@@ -303,16 +414,29 @@ public class GameManager : MonoBehaviour
 
     public float GetRandomizedDurability()
     {
-        float baseDurability = initialDurabilityPoints - currentId * durabilityReducedPerGeneration;
-        if(baseDurability < minimumDurabilityPoints) { baseDurability = minimumDurabilityPoints; }
+        if(lastDurability == 0) { lastDurability = initialDurabilityPoints; }
 
-        float randomMod = Random.Range(0, durabilityVariation);
-        if(Random.Range(0, 2) == 0)
+        float durability = lastDurability;
+        if (durabilityDown)
         {
-            randomMod = -randomMod;
+            durability -= Random.Range(0, durabilityJumpVariationMax);
+        }
+        else
+        {
+            durability += Random.Range(0, durabilityJumpVariationMax);
         }
 
-        float finDurability = baseDurability + randomMod;
+        if(durability < minInitialIceDurability) 
+        { 
+            durabilityDown = false; 
+        }
+        else if(durability > Mathf.Max((maxInitialIceDurability - 
+            currentId * durabilityReducedPerGeneration), minBaseDurability)) 
+        { 
+            durabilityDown = true; 
+        }
+
+        float finDurability = durability;
 
         if(finDurability < minInitialIceDurability) 
         { 
@@ -324,6 +448,8 @@ public class GameManager : MonoBehaviour
             finDurability = maxInitialIceDurability; 
         }
 
+        lastDurability = finDurability;
+
         return finDurability;
     }
 
@@ -333,7 +459,7 @@ public class GameManager : MonoBehaviour
         {
             furthestActivatedIceId = id;
 
-            if(currentId - id < 80)
+            if(currentId - id < 40)
             {
                 for(int i = 0; i < icePerOh; i++)
                 {

@@ -6,7 +6,7 @@ using UnityEngine.Experimental.Rendering.Universal;
 public class Ore : MonoBehaviour
 {
     [SerializeField] private GameManager gameManager;
-    [SerializeField] private string oreName;
+    [SerializeField] public string oreName;
     [SerializeField] private Sprite oreSprite;
     [SerializeField] private Color color;
 
@@ -31,7 +31,7 @@ public class Ore : MonoBehaviour
     public void Initialize(string name, Sprite oreSprite, Color color, int hitsToDestroy, float damageToIce, 
         float damageRadius, GameManager gameManager, int value)
     {
-        this.oreName = name;
+        oreName = name;
         this.oreSprite = oreSprite;
         this.hitsToDestroy = hitsToDestroy;
         this.damageToIce = damageToIce;

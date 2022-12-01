@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class IceBlock : MonoBehaviour
 {
-    [SerializeField] private BoxCollider2D iceCollider;
+    [SerializeField] public BoxCollider2D iceCollider;
     [SerializeField] private SpriteRenderer spriteRenderer;
+
+    [SerializeField] private GameObject explodeParticles;
 
     // 0 to 100. When reaches 0, ice dies
     [SerializeField] private float durability;
@@ -22,9 +24,9 @@ public class IceBlock : MonoBehaviour
     private float durabilityWhenSteppedOn = 0.5f;
     private float durabilityPerSteppedSecond = 0.5f;
 
-    private float durabilityBeforeAlphaChange = 20;
-    private float maxAlpha = 0.9f;
-    private float minAlpha = 0.35f;
+    private float durabilityBeforeAlphaChange = 10;
+    private float maxAlpha = 0.45f;
+    private float minAlpha = 0.2f;
 
     public void InitIce(int id, float durability, GameManager gameManager)
     {
@@ -115,8 +117,7 @@ public class IceBlock : MonoBehaviour
 
     public void Die()
     {
-        gameManager.RequestIceDie(this);
-        StartCoroutine(AnimateDeath());
+        gameManager.Die(this);
     }
 
     public void BlinkDurability()
@@ -124,14 +125,16 @@ public class IceBlock : MonoBehaviour
 
     }
 
+    public void Explode()
+    {
+        GameObject effect = Instantiate(explodeParticles);
+        effect.transform.position = transform.position;
+        gameObject.SetActive(false);
+    }
+
     public void TakeVibrationDamage(float damage)
     {
         durability -= damage;
-
-        if (durability <= 0)
-        {
-            Die();
-        }
 
         UpdateAlpha();
     }
@@ -140,12 +143,11 @@ public class IceBlock : MonoBehaviour
     {
         if(durability > durabilityBeforeAlphaChange)
         {
-            spriteRenderer.color = new Color(color.r, color.g, color.b, maxAlpha);
+            spriteRenderer.color = new Color(color.r, color.g, color.b, Mathf.Lerp(maxAlpha, 1, Mathf.Min(durability * 1.4f / 100, 1)));
         }
         else
         {
-            float a = (durability / 100) * maxAlpha;
-            if(a < minAlpha) { a = minAlpha;  }
+            float a = Mathf.Lerp(minAlpha, maxAlpha, Mathf.Max(durability * 1.4f / 100, 0));
             spriteRenderer.color = new Color(color.r, color.g, color.b, a);
         }
     }
@@ -154,14 +156,14 @@ public class IceBlock : MonoBehaviour
     {
         float elapsed;
 
-        while (durability > 0)
+        while (true)
         {
             if (steppedOn)
             {
                 elapsed = Time.deltaTime * durabilityPerSteppedSecond;
                 durability -= elapsed;
 
-                if(durability <= 0)
+                if(durability <= 0 && steppedOn)
                 {
                     Die();
                 }
@@ -171,12 +173,5 @@ public class IceBlock : MonoBehaviour
 
             yield return new WaitForFixedUpdate();
         }
-    }
-
-    private IEnumerator AnimateDeath()
-    {
-        yield return new WaitForFixedUpdate();
-
-        
     }
 }
