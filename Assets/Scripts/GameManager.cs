@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Player player;
     [SerializeField] Parallax parallax;
+    [SerializeField] UIManager uiManager;
 
     // In-game values
 
@@ -23,6 +24,23 @@ public class GameManager : MonoBehaviour
     private int currentOhCount = 0;
 
     private int currentOreCount = 0;
+
+    private float currentFrost = 0;
+    private float currentDepth = 0;
+
+    private int sonarCount = 5;
+    private int constructCount = 3;
+
+    private int currentEmerald;
+    private int currentGold;
+    private int currentSilver;
+    private int currentVibralite;
+    private int currentMoldalium;
+    private int currentElectrite;
+    private int currentRuby;
+    private int currentDiamond;
+
+    private int wealth;
 
     // Prefabs
 
@@ -47,11 +65,11 @@ public class GameManager : MonoBehaviour
     // Game Constants
 
     private float maxInitialIceDurability = 90;
-    private float minInitialIceDurability = 15;
+    private float minInitialIceDurability = 20;
 
-    private float initialDurabilityPoints = 30;
+    private float initialDurabilityPoints = 40;
 
-    private float minimumDurabilityPoints = 15;
+    private float minimumDurabilityPoints = 30;
     private float durabilityVariation = 15;
 
     private float durabilityReducedPerGeneration = 0.07f;
@@ -67,6 +85,11 @@ public class GameManager : MonoBehaviour
     private int initialOhGenerationCount = 3;
 
     private int icePerOh = 25;
+
+    private float frostPerSecond = 1f;
+
+    // Gems?
+    private float frostDecreasePerRubyHit = 4f;
 
     public struct OreType
     {
@@ -103,12 +126,12 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] private List<OreType> oreTypes = new List<OreType>() { 
         new OreType("emerald", -10, 50, new Color(0.5f, 1f, 0.5f), 2, 3, 1, 7),
-        new OreType("gold", -10, 75, new Color(1f, 0.8f, 0f), 3, 4, 1, 5),
+        new OreType("gold", 10, 75, new Color(1f, 0.8f, 0f), 3, 4, 1.3f, 5),
         new OreType("silver", -10, 50, new Color(0.9f, 0.9f, 1f), 2, 2, 2, 10),
-        new OreType("moldalium", 80, 100, new Color(0.3f, 0.3f, 1f), 2, 8, 1, 5),
-        new OreType("electrite", 80, 100, new Color(1f, 0.45f, 0.75f), 3, 6, 1, 5),
-        new OreType("heat ruby", 150, 150, new Color(1f, 0.2f, 0.2f), 4, 5, 1, 10),
-        new OreType("diamond", 150, 250, new Color(0.6f, 1f, 1f), 5, 4, 1, 15)
+        new OreType("moldalium", 50, 100, new Color(0.3f, 0.3f, 1f), 2, 8, 1.5f, 5),
+        new OreType("electrite", 50, 100, new Color(1f, 0.45f, 0.75f), 3, 6, 1.7f, 5),
+        new OreType("heat ruby", 100, 150, new Color(1f, 0.2f, 0.2f), 4, 5, 2f, 10),
+        new OreType("diamond", 100, 250, new Color(0.6f, 1f, 1f), 5, 4, 1, 15)
     };
 
     private void Start()
@@ -126,13 +149,17 @@ public class GameManager : MonoBehaviour
     {
         if (isPlaying)
         {
+            currentDepth = (float)System.Math.Round(player.transform.position.x + 2.55f, 1);
+            currentFrost += Time.deltaTime * frostPerSecond;
 
+            uiManager.UpdateGameValues(wealth, currentFrost, currentDepth, sonarCount, constructCount);
         }
     }
 
     public void StartGame()
     {
         isPlaying = true;
+        player.isPlaying = true;
     }
 
     public void GenerateStartingIce()
@@ -197,7 +224,7 @@ public class GameManager : MonoBehaviour
 
         if(Random.Range(0, 10) > 1)
         {
-            oposX = overheadInitX + currentOhCount * xOverheadInterval + Random.Range(0.5f, 0.8f) * xOverheadInterval;
+            oposX = overheadInitX + currentOhCount * xOverheadInterval - Random.Range(0.1f, 0.3f) * xOverheadInterval;
 
             GenerateRandomOre(oposX, oposY);
         }
@@ -214,7 +241,7 @@ public class GameManager : MonoBehaviour
 
         Ore ore = newOre.GetComponent<Ore>();
 
-        float depth = player.transform.position.x;
+        float depth = currentDepth;
 
         List<OreType> possibleOres = new List<OreType>();
         foreach (OreType oreType in oreTypes)
@@ -229,7 +256,7 @@ public class GameManager : MonoBehaviour
         OreType selectedOre = possibleOres[selection];
 
         ore.Initialize(selectedOre.name, oreSprites[Random.Range(0, oreSprites.Count)], selectedOre.color,
-            selectedOre.hitsToDestroy, selectedOre.damageToIce, selectedOre.damageRadius, this);
+            selectedOre.hitsToDestroy, selectedOre.damageToIce, selectedOre.damageRadius, this, selectedOre.value);
 
         currentOreCount++;
 
@@ -244,6 +271,34 @@ public class GameManager : MonoBehaviour
     public void RequestOreDie(Ore ore)
     {
         ores.Remove(ore);
+        wealth += ore.value;
+
+        switch (ore.name)
+        {
+            case "emerald":
+                currentEmerald++;
+                break;
+            case "gold":
+                currentGold++;
+                break;
+            case "silver":
+                currentSilver++;
+                break;
+            case "moldalium":
+                currentMoldalium++;
+                break;
+            case "electrite":
+                currentElectrite++;
+                break;
+            case "heat ruby":
+                currentRuby++;
+                break;
+            case "diamond":
+                currentDiamond++;
+                break;
+            default:
+                break;
+        }
     }
 
     public float GetRandomizedDurability()

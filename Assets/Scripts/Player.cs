@@ -14,24 +14,20 @@ public class Player : MonoBehaviour
 
     // Constants
 
-    private float frostSlowRatio = 0.4f;
-    private float frostThreshold = 60f;
-
+    private float baseSpeed = 1f;
     private float speed = 2.5f;
 
     private float rotateSpeed = 340f;
     [SerializeField] private bool moving = false;
     [SerializeField] private bool goingRight = true;
 
-    private float maxCartDisplacement = 0.04f;
+    private float maxCartDisplacement = 0.02f;
     private float maxDisplacementPerSecond = 0.36f;
 
     // In-game values
     public bool isPlaying;
 
     private bool slowed;
-
-    private float currentFrost;
 
     private int currentEmerald;
     private int currentGold;
@@ -60,24 +56,22 @@ public class Player : MonoBehaviour
         currentGold = 0;
         currentEmerald = 0;
 
-        currentFrost = 0;
-
         slowed = false;
     }
 
     void FixedUpdate()
     {
-        if (isPlaying)
+        if (Input.GetKeyDown(KeyCode.D) && isPlaying)
+        {
+            moving = true;
+            goingRight = true;
+        }
+
+        if (isPlaying && moving)
         {
             if (Input.GetKey(KeyCode.D))
             {
                 MoveCharacter("right");
-                moving = true;
-                goingRight = true;
-            }
-            else
-            {
-                moving = false;
             }
             
             if (Input.GetKey(KeyCode.A))
@@ -85,6 +79,7 @@ public class Player : MonoBehaviour
                 MoveCharacter("left");
             }
 
+            transform.position = new Vector3(transform.position.x + baseSpeed * Time.fixedDeltaTime, transform.position.y);
         }
     }
 
@@ -93,20 +88,6 @@ public class Player : MonoBehaviour
         if(direction == "right")
         {
             transform.position = new Vector3(transform.position.x + speed * Time.fixedDeltaTime, transform.position.y);
-        }
-    }
-
-    public void AddFrost(float value)
-    {
-        currentFrost += value;
-
-        if(currentFrost > frostThreshold)
-        {
-            slowed = true;
-        }
-        else
-        {
-            slowed = false;
         }
     }
 

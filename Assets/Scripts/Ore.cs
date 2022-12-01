@@ -15,9 +15,10 @@ public class Ore : MonoBehaviour
     [SerializeField] private float damageToIce;
     // Value = 1.5 + actual radius
     [SerializeField] private float damageRadius;
+    [SerializeField] public int value;
 
     // Pre-assigned
-    [SerializeField] private CircleCollider2D oreCollider2D;
+    [SerializeField] public CircleCollider2D oreCollider2D;
     [SerializeField] private SpriteRenderer gemSprite;
     [SerializeField] private Light2D glow;
 
@@ -28,7 +29,7 @@ public class Ore : MonoBehaviour
     [SerializeField] private List<IceBlock> iceBlocksInRange;
 
     public void Initialize(string name, Sprite oreSprite, Color color, int hitsToDestroy, float damageToIce, 
-        float damageRadius, GameManager gameManager)
+        float damageRadius, GameManager gameManager, int value)
     {
         this.oreName = name;
         this.oreSprite = oreSprite;
@@ -36,6 +37,7 @@ public class Ore : MonoBehaviour
         this.damageToIce = damageToIce;
         this.damageRadius = damageRadius;
         this.color = color;
+        this.value = value;
 
         this.gameManager = gameManager;
 

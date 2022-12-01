@@ -14,17 +14,17 @@ public class IceBlock : MonoBehaviour
     [SerializeField] private int id;
 
     private Color color;
-    private bool steppedOn;
+    [SerializeField] private bool steppedOn;
 
     private GameManager gameManager;
 
     // Constants
-    private float durabilityWhenSteppedOn = 1f;
-    private float durabilityPerSteppedSecond = 0.66f;
+    private float durabilityWhenSteppedOn = 0.5f;
+    private float durabilityPerSteppedSecond = 0.5f;
 
-    private float durabilityBeforeAlphaChange = 15;
+    private float durabilityBeforeAlphaChange = 20;
     private float maxAlpha = 0.9f;
-    private float minAlpha = 0.5f;
+    private float minAlpha = 0.35f;
 
     public void InitIce(int id, float durability, GameManager gameManager)
     {
@@ -71,7 +71,7 @@ public class IceBlock : MonoBehaviour
 
         float time = 0;
 
-        while(time < 1)
+        while(time < 1 && steppedOn)
         {
             time += Time.deltaTime / downTime;
             transform.position = Vector3.Lerp(currentPos, targetPos, time);
@@ -91,7 +91,7 @@ public class IceBlock : MonoBehaviour
 
         float time = 0;
 
-        while (time < 1)
+        while (time < 1 && !steppedOn)
         {
             time += Time.deltaTime / upTime;
             transform.position = Vector3.Lerp(currentPos, targetPos, time);
@@ -103,9 +103,9 @@ public class IceBlock : MonoBehaviour
     private void SetRandomColor()
     {
         float a = durability / 100;
-        float r = Random.Range(0.5f, 0.6f);
-        float g = Random.Range(0.7f, 0.8f);
-        float b = Random.Range(0.9f, 1f);
+        float r = Random.Range(0.2f, 0.3f);
+        float g = Random.Range(0.2f, 0.3f);
+        float b = Random.Range(0.4f, 0.5f);
 
         color = new Color(r, g, b, a);
         spriteRenderer.color = color;

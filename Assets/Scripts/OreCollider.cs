@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class OreCollider : MonoBehaviour
 {
-    [SerializeField] private Ore ore;
+    [SerializeField] public Ore ore;
+    public bool visualActive;
 
     public void HitOre()
     {
