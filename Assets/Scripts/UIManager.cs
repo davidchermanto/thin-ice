@@ -6,11 +6,17 @@ using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] private CanvasGroup blackScreen;
+    [SerializeField] private GameObject tutorialCanvas;
+
     [SerializeField] private TextMeshProUGUI wealthNum;
     [SerializeField] private TextMeshProUGUI frostNum;
     [SerializeField] private TextMeshProUGUI depthNum;
     [SerializeField] private TextMeshProUGUI sonarNum;
     [SerializeField] private TextMeshProUGUI constructNum;
+
+    [SerializeField] private TextMeshProUGUI lastScore;
+    [SerializeField] private TextMeshProUGUI highScore;
 
     // Gems
     [Header("Wealth Menu")]
@@ -31,10 +37,73 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI stelNum;
     [SerializeField] private TextMeshProUGUI stelValue;
 
-    // Update is called once per frame
-    void Update()
+    public void NewScore(int score)
     {
-        
+        lastScore.SetText(score + "");
+    }
+
+    public void TurnOnTutorial()
+    {
+        StartCoroutine(TutorialOn());
+    }
+
+    private IEnumerator TutorialOn()
+    {
+        float blackTime = 0.3f;
+        float blackHold = 0.5f;
+
+        float time = 0;
+        while(time < 1)
+        {
+            time += Time.deltaTime / blackTime;
+            blackScreen.alpha = Mathf.Lerp(0, 1, time);
+
+            yield return new WaitForEndOfFrame();
+        }
+
+        yield return new WaitForSeconds(blackHold);
+        tutorialCanvas.SetActive(true);
+
+        time = 0;
+        while (time < 1)
+        {
+            time += Time.deltaTime / blackTime;
+            blackScreen.alpha = Mathf.Lerp(1, 0, time);
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    public void TurnOffTutorial()
+    {
+        StartCoroutine(TutorialOff());
+    }
+
+    private IEnumerator TutorialOff()
+    {
+        float blackTime = 0.3f;
+        float blackHold = 0.5f;
+
+        float time = 0;
+        while (time < 1)
+        {
+            time += Time.deltaTime / blackTime;
+            blackScreen.alpha = Mathf.Lerp(0, 1, time);
+
+            yield return new WaitForEndOfFrame();
+        }
+
+        yield return new WaitForSeconds(blackHold);
+        tutorialCanvas.SetActive(false);
+
+        time = 0;
+        while (time < 1)
+        {
+            time += Time.deltaTime / blackTime;
+            blackScreen.alpha = Mathf.Lerp(1, 0, time);
+
+            yield return new WaitForEndOfFrame();
+        }
     }
     
     public void UpdateGameValues(int wealth, float frost, float depth, int sonar, int construct)

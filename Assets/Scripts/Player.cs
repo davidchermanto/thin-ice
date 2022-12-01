@@ -39,17 +39,12 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.D) && isPlaying)
-        {
-            moving = true;
-            goingRight = true;
-        }
-
-        if (isPlaying && moving)
+        if (isPlaying)
         {
             if (Input.GetKey(KeyCode.D) || accRight)
             {
                 MoveCharacter("right");
+                moving = true;
             }
 
             transform.position = new Vector3(transform.position.x + baseSpeed * Time.fixedDeltaTime, transform.position.y);

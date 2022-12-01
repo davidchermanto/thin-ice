@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     private float initX = -1.5f;
     private float initY = -4.2f;
 
+    [SerializeField] Transform startPos;
     [SerializeField] Player player;
     [SerializeField] Parallax parallax;
     [SerializeField] UIManager uiManager;
@@ -54,7 +55,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject orePrefab;
     [SerializeField] private List<Sprite> oreSprites;
 
-    [SerializeField] private GameObject sonarEffect;
+    [SerializeField] private SpriteRenderer frost;
 
     //
     [Header("Folders")]
@@ -93,7 +94,7 @@ public class GameManager : MonoBehaviour
 
     private int icePerOh = 25;
 
-    private float frostPerSecond = 1f;
+    private float frostPerSecond = 1.4f;
 
     // Gems?
     private float frostDecreasePerRubyHit = 5f;
@@ -144,13 +145,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        GenerateStartingOverheads();
-        GenerateStartingIce();
 
-        player.Initialize();
-        parallax.Initialize();
-
-        StartGame();
     }
 
     private void Update()
@@ -159,6 +154,9 @@ public class GameManager : MonoBehaviour
         {
             currentDepth = (float)System.Math.Round(player.transform.position.x + 2.55f, 1);
             currentFrost += Time.deltaTime * frostPerSecond;
+            frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0, 0.1f, currentFrost / 100));
+
+            if(currentFrost > 100) { DieFrost(); }
 
             if (!player.moving)
             {
@@ -175,6 +173,15 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        uiManager.TurnOffTutorial();
+        ResetAll();
+
+        GenerateStartingOverheads();
+        GenerateStartingIce();
+
+        player.Initialize();
+        parallax.Initialize();
+
         isPlaying = true;
         player.isPlaying = true;
         vCam.SetActive(true);
@@ -201,12 +208,104 @@ public class GameManager : MonoBehaviour
 
     public void ActivateSonar()
     {
+        if (isPlaying)
+        {
+            if(sonarCount > 0)
+            {
+                sonarCount--;
+                StartCoroutine(Sonar());
+            }
+        }
+    }
 
+    private IEnumerator Sonar()
+    {
+        int iceDeleteRange = 40;
+
+        int higherCounter = furthestActivatedIceId;
+        int lowerCounter = furthestActivatedIceId - 1;
+
+        bool higherEnd = false;
+        bool lowerEnd = false;
+
+        for (int i = 0; i < iceDeleteRange; i++)
+        {
+            if (!higherEnd)
+            {
+                if (iceblocks[higherCounter].isActiveAndEnabled)
+                {
+                    iceblocks[higherCounter].BlinkDurability();
+                }
+
+                higherCounter++;
+            }
+
+            if (!lowerEnd)
+            {
+                if (iceblocks[lowerCounter].isActiveAndEnabled)
+                {
+                    iceblocks[lowerCounter].BlinkDurability();
+                }
+
+                lowerCounter--;
+            }
+
+            if (higherCounter > iceblocks.Count) { higherEnd = true; }
+            if (lowerCounter < 1) { lowerEnd = true; }
+
+            yield return new WaitForSeconds(0.03f);
+        }
     }
 
     public void ActivateConstruct()
     {
+        if (isPlaying)
+        {
+            if (constructCount > 0)
+            {
+                constructCount--;
+                StartCoroutine(Construct());
+            }
+        }
+    }
 
+    private IEnumerator Construct()
+    {
+        int iceDeleteRange = 20;
+
+        int higherCounter = furthestActivatedIceId;
+        int lowerCounter = furthestActivatedIceId - 1;
+
+        bool higherEnd = false;
+        bool lowerEnd = false;
+
+        for (int i = 0; i < iceDeleteRange; i++)
+        {
+            if (!higherEnd)
+            {
+                if (iceblocks[higherCounter].isActiveAndEnabled)
+                {
+                    iceblocks[higherCounter].Construct();
+                }
+
+                higherCounter++;
+            }
+
+            if (!lowerEnd)
+            {
+                if (iceblocks[lowerCounter].isActiveAndEnabled)
+                {
+                    iceblocks[lowerCounter].Construct();
+                }
+
+                lowerCounter--;
+            }
+
+            if (higherCounter > iceblocks.Count) { higherEnd = true; }
+            if (lowerCounter < 1) { lowerEnd = true; }
+
+            yield return new WaitForSeconds(0.03f);
+        }
     }
 
     // Generate ice uses current id to determine where to generate the ice.
@@ -299,21 +398,74 @@ public class GameManager : MonoBehaviour
     }
 
     // Player loses?
-    public void Die(IceBlock iceBlock)
+    public void DieFall(IceBlock iceBlock)
     {
         if (!player.accLeft)
         {
             isPlaying = false;
             player.isPlaying = false;
             player.StopAllCoroutines();
+            vCam.SetActive(false);
+
             StartCoroutine(DeathAnimation());
         }
     }
 
+    public void DieFrost()
+    {
+        if (!player.accLeft)
+        {
+            isPlaying = false;
+            player.isPlaying = false;
+            player.StopAllCoroutines();
+            vCam.SetActive(false);
+
+            StartCoroutine(FreezeAnimation());
+        }
+    }
+
+    public void ResetAll()
+    {
+        isPlaying = false;
+        currentId = 0;
+        furthestActivatedIceId = 0;
+        currentOhCount = 0;
+        currentOreCount = 0;
+        sonarCount = 3;
+        constructCount = 3;
+
+        currentFrost = 0;
+        currentDepth = 0;
+
+        currentEmerald = 0;
+        currentGold = 0;
+        currentSilver = 0;
+        currentMoldalium = 0;
+        currentElectrite = 0;
+        currentRuby = 0;
+        currentDiamond = 0;
+        currentStellium = 0;
+
+        lastDurability = 0;
+        durabilityDown = false;
+
+        wealth = 0;
+
+        for(int i = 0; i < iceblocks.Count; i++) { Destroy(iceblocks[i].gameObject); }
+        iceblocks = new List<IceBlock>();
+
+        for(int i = 0; i < ores.Count; i++) { Destroy(ores[i].gameObject); }
+        ores = new List<Ore>();
+
+        foreach(Transform child in rockFolder.transform) { Destroy(child.gameObject); }
+
+        frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, 0);
+    }
+
+    // Death by falling
     private IEnumerator DeathAnimation()
     {
         StartCoroutine(DeleteIces());
-        vCam.SetActive(false);
 
         yield return new WaitForSeconds(2f);
 
@@ -330,6 +482,44 @@ public class GameManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
+        uiManager.NewScore(wealth);
+        uiManager.TurnOnTutorial();
+
+        player.transform.position = startPos.transform.position;
+    }
+
+    private IEnumerator FreezeAnimation()
+    {
+        float time = 0;
+        float freezeTime = 1;
+        while (time < 1)
+        {
+            time += Time.deltaTime * freezeTime;
+
+            frost.color = new Color(frost.color.r, frost.color.g, frost.color.b, Mathf.Lerp(0.1f, 0.3f, time));
+
+            yield return new WaitForEndOfFrame();
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        time = 0;
+        float fallDuration = 1;
+        float fallSpeed = 15;
+        while (time < 1)
+        {
+            time += Time.deltaTime * fallDuration;
+
+            player.transform.position = new Vector3(player.transform.position.x,
+                player.transform.position.y - fallSpeed * Time.deltaTime);
+
+            yield return new WaitForEndOfFrame();
+        }
+
+        uiManager.NewScore(wealth);
+        uiManager.TurnOnTutorial();
+
+        player.transform.position = startPos.transform.position;
     }
 
     private IEnumerator DeleteIces()

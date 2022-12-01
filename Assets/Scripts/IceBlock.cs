@@ -18,6 +18,10 @@ public class IceBlock : MonoBehaviour
     private Color color;
     [SerializeField] private bool steppedOn;
 
+    [SerializeField] private SpriteRenderer duraObject;
+    private Color one = new Color(0.4f, 1f, 0.4f);
+    private Color two = new Color(1f, 0.4f, 0.4f);
+
     private GameManager gameManager;
 
     // Constants
@@ -117,12 +121,50 @@ public class IceBlock : MonoBehaviour
 
     public void Die()
     {
-        gameManager.Die(this);
+        gameManager.DieFall(this);
     }
 
     public void BlinkDurability()
     {
+        duraObject.color = Color.Lerp(two, one, durability * 2.4f / 100);
+        StartCoroutine(AnimateDura());
+    }
 
+    public void Construct()
+    {
+        duraObject.color = new Color(0.5f, 0.1f, 0.5f);
+        durability += 20;
+        StartCoroutine(AnimateConstruct());
+    }
+
+    private IEnumerator AnimateDura()
+    {
+        float blinkTime = 4f;
+        float time = 0;
+
+        while(time < 1)
+        {
+            time += Time.deltaTime / blinkTime;
+
+            duraObject.color = new Color(duraObject.color.r, duraObject.color.g, duraObject.color.b, Mathf.Lerp(1, 0, time));
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    private IEnumerator AnimateConstruct()
+    {
+        float blinkTime = 2f;
+        float time = 0;
+
+        while (time < 1)
+        {
+            time += Time.deltaTime / blinkTime;
+
+            duraObject.color = new Color(duraObject.color.r, duraObject.color.g, duraObject.color.b, Mathf.Lerp(1, 0, time));
+
+            yield return new WaitForEndOfFrame();
+        }
     }
 
     public void Explode()
@@ -166,6 +208,7 @@ public class IceBlock : MonoBehaviour
                 if(durability <= 0 && steppedOn)
                 {
                     Die();
+                    break;
                 }
 
                 UpdateAlpha();
